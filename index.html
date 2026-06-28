@@ -687,7 +687,7 @@
     });
 
     /* ── Contact form ── */
-    document.getElementById('contact-form').addEventListener('submit', function (e) {
+    document.getElementById('contact-form').addEventListener('submit', async function (e) {
       e.preventDefault();
 
       const fname   = document.getElementById('fname').value.trim();
@@ -697,41 +697,51 @@
       const subject = document.getElementById('subject').value;
       const message = document.getElementById('message').value.trim();
       const status  = document.getElementById('form-status');
+      const btn     = document.querySelector('.btn-submit');
+
+      const showError = function (msg) {
+        status.textContent = msg;
+        status.style.color = 'rgba(255,160,130,0.95)';
+        status.classList.add('visible');
+      };
 
       if (!fname || !lname || !email || !message) {
-        status.textContent = 'Please fill in all required fields.';
-        status.style.color = 'rgba(255,160,130,0.95)';
-        status.classList.add('visible');
+        showError('Please fill in all required fields.');
         return;
       }
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        status.textContent = 'Please enter a valid email address.';
-        status.style.color = 'rgba(255,160,130,0.95)';
-        status.classList.add('visible');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError('Please enter a valid email address.');
         return;
       }
 
-      const body = [
-        'Name: ' + fname + ' ' + lname,
-        'Email: ' + email,
-        org     ? 'Organization: ' + org         : '',
-        subject ? 'Area of Interest: ' + subject : '',
-        '',
-        'Message:',
-        message
-      ].filter(Boolean).join('\n');
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      status.classList.remove('visible');
 
-      window.location.href =
-        'mailto:contact@manifoldoncology.com' +
-        '?subject=' + encodeURIComponent('Inquiry — ' + (subject || 'General')) +
-        '&body='    + encodeURIComponent(body);
+      try {
+        const res = await fetch('/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fname, lname, email, org, subject, message }),
+        });
 
-      status.textContent = 'Opening your email client…';
-      status.style.color = 'rgba(255,255,255,0.5)';
-      status.classList.add('visible');
-      setTimeout(function () { status.classList.remove('visible'); }, 3000);
+        const result = await res.json();
+
+        if (res.ok && result.success) {
+          status.textContent = 'Message sent — we\'ll be in touch soon.';
+          status.style.color = 'rgba(255,200,120,0.95)';
+          status.classList.add('visible');
+          document.getElementById('contact-form').reset();
+        } else {
+          showError(result.error || 'Something went wrong. Please try again.');
+        }
+      } catch {
+        showError('Network error. Please check your connection and try again.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Send Message <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+      }
     });
   </script>
 
