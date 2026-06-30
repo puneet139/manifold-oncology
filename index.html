@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -65,12 +66,22 @@
     }
 
     .nav-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
       font-family: var(--font-display);
       font-size: 0.88rem;
       font-weight: 600;
       letter-spacing: 0.1em;
       color: var(--ink);
       text-decoration: none;
+    }
+
+    .nav-logo img {
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      display: block;
     }
 
     .nav-links {
@@ -505,7 +516,10 @@
   <!-- NAV -->
   <header class="site-header">
     <div class="nav-inner">
-      <a href="#hero" class="nav-logo">Manifold Oncology</a>
+      <a href="#hero" class="nav-logo">
+        <img src="/icon.svg" alt="Manifold Oncology icon" />
+        Manifold Oncology
+      </a>
       <ul class="nav-links">
         <li><a href="#research" data-section="research">Research</a></li>
         <li><a href="#methodology" data-section="methodology">Methodology</a></li>
